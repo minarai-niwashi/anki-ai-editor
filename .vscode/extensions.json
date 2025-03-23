@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "charliermarsh.ruff",
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "ms-toolsai.jupyter",
+    "njpwerner.autodocstring",
+    "shardulm94.trailing-spaces",
+    "Gruntfuggly.todo-tree",
+  ]
+}
