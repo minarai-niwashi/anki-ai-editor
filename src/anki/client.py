@@ -1,8 +1,32 @@
 import json
+import re
+from html.parser import HTMLParser
 
 import requests
 
 from config import ANKI_URL, KEY
+
+
+class HTMLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.fed = []
+
+    def handle_data(self, data: str):
+        self.fed.append(data)
+
+    def get_data(self):
+        return "".join(self.fed)
+
+
+def strip_html(html: str) -> str:
+    html = re.sub(
+        pattern=r"<(style|script).*?>.*?</\1>", repl="", string=html, flags=re.DOTALL
+    )
+    s = HTMLStripper()
+    s.feed(data=html)
+    return s.get_data().strip()
 
 
 class AnkiClient:
@@ -22,7 +46,19 @@ class AnkiClient:
         query = "deck:*"
         card_ids = self._invoke(action="findCards", query=query)["result"]
         notes = self._invoke(action="cardsInfo", cards=card_ids)["result"]
-        return [(note["note"], note["question"], note["answer"]) for note in notes]
+        cards = []
+        for note in notes:
+            node_id = note["note"]
+            question = strip_html(html=note["question"])
+            answer = strip_html(html=note["answer"])
+            cards.append(
+                {
+                    "node_id": node_id,
+                    "question": question,
+                    "answer": answer,
+                }
+            )
+        return cards
 
     def update_note_answer(self, note_id: str, new_answer: str):
         return self._invoke(
