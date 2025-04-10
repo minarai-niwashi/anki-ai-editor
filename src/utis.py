@@ -1,5 +1,6 @@
 import difflib
 import os
+import platform
 import tkinter as tk
 from tkinter import scrolledtext, ttk
 
@@ -10,7 +11,8 @@ class DiffViewer:
 
     def _is_wsl(self) -> bool:
         return (
-            "WSL_DISTRO_NAME" in os.environ or "microsoft" in os.uname().release.lower()
+            "WSL_DISTRO_NAME" in os.environ
+            or "microsoft" in platform.uname().release.lower()
         )
 
     def display_diff(self, original: str, revised: str) -> str:
