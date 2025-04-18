@@ -25,7 +25,7 @@ class CardEditor:
             input=prompt,
             temperature=0.5,
             top_p=1.0,
-            max_tokens=512,
+            max_output_tokens=512,
         )
 
         return response.output_text.strip()
