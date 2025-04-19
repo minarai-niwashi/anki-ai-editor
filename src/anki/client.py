@@ -51,11 +51,13 @@ class AnkiClient:
             node_id = note["note"]
             question = strip_html(html=note["question"])
             answer = strip_html(html=note["answer"])
+            categoty = note["deckName"]
             cards.append(
                 {
                     "node_id": node_id,
                     "question": question,
                     "answer": answer,
+                    "category": categoty,
                 }
             )
         return cards
