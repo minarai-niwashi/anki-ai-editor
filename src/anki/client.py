@@ -48,13 +48,13 @@ class AnkiClient:
         notes = self._invoke(action="cardsInfo", cards=card_ids)["result"]
         cards = []
         for note in notes:
-            node_id = note["note"]
+            note_id = note["note"]
             question = strip_html(html=note["question"])
             answer = strip_html(html=note["answer"])
             categoty = note["deckName"]
             cards.append(
                 {
-                    "node_id": node_id,
+                    "note_id": note_id,
                     "question": question,
                     "answer": answer,
                     "category": categoty,
