@@ -5,6 +5,7 @@ from html.parser import HTMLParser
 import requests
 
 from config import ANKI_URL, KEY
+from utis import check_response_ok
 
 
 class HTMLStripper(HTMLParser):
@@ -35,17 +36,18 @@ class AnkiClient:
         self.key = KEY
 
     def _invoke(self, action: dict, **param):
-        return requests.post(
+        response = requests.post(
             url=self.url,
             data=json.dumps(
                 obj={"action": action, "version": 6, "params": param, "key": self.key}
             ),
-        ).json()
+        )
+        return check_response_ok(response=response)
 
     def get_all_cards(self):
         query = "deck:*"
-        card_ids = self._invoke(action="findCards", query=query)["result"]
-        notes = self._invoke(action="cardsInfo", cards=card_ids)["result"]
+        card_ids = self._invoke(action="findCards", query=query)
+        notes = self._invoke(action="cardsInfo", cards=card_ids)
         cards = []
         for note in notes:
             note_id = note["note"]
@@ -65,5 +67,14 @@ class AnkiClient:
     def update_note_answer(self, note_id: str, new_answer: str):
         return self._invoke(
             action="updateNoteFields",
-            note={"id": note_id, "fields": {"Back": new_answer}},
+            note={"id": note_id, "fields": {"裏面": new_answer}},
         )
+
+    def add_ai_tag_to_note(self, note_id: int, tag: str = "edited"):
+        return self._invoke(action="addTags", notes=[note_id], tags=tag)
+
+    def has_tag(self, note_id: int, tag: str = "edited"):
+        result = self._invoke(action="notesInfo", notes=[note_id])
+        if result and "tags" in result[0]:
+            return tag in result[0]["tags"]
+        return False
