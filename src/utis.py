@@ -2,7 +2,9 @@ import difflib
 import os
 import platform
 import tkinter as tk
-from tkinter import scrolledtext, ttk
+from tkinter import messagebox, scrolledtext, ttk
+
+import requests
 
 
 class DiffViewer:
@@ -73,3 +75,30 @@ class DiffViewer:
         root.mainloop()
 
         return root.confirm_result
+
+    def confirm_resubmit(self, question: str, answer: str) -> bool:
+        message = f"このカードは既にAIで推敲されています。\n\n質問: {question}\n答え: {answer}\n\n再度推敲しますか？"
+        if not self.use_gui:
+            print(message)
+            ans = input("(y/n): ").strip().lower()
+            return ans == "y"
+
+        root = tk.Tk()
+        root.withdraw()
+        result = messagebox.askyesno(
+            title="再推敲",
+            message=message,
+        )
+        root.destroy()
+        return result
+
+
+def check_response_ok(response):
+    if not response.ok:
+        raise requests.HttpError(
+            f"AnkiConnect request failed with status {response.status_code}: {response.text}"
+        )
+    json_response = response.json()
+    if json_response["error"]:
+        raise ValueError(f"AnkiConnect error: {json_response['error']}")
+    return json_response["result"]
