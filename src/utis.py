@@ -19,6 +19,11 @@ class DiffViewer:
 
     def display_diff(self, original: str, revised: str) -> str:
         diff = difflib.ndiff(a=original.split(), b=revised.split())
+        changes = [
+            line for line in diff if line.startswith("+") or line.startswith("-")
+        ]
+        if not changes:
+            return "（差分はありません）"
         return "\n".join(diff)
 
     def show_cli(self, question: str, original: str, revised: str) -> bool:
