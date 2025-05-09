@@ -18,22 +18,37 @@ class DiffViewer:
         )
 
     def display_diff(self, original: str, revised: str) -> str:
-        diff = difflib.ndiff(a=original.split(), b=revised.split())
+        diff = list(difflib.ndiff(a=[original], b=[revised]))
+        filtered_diff = [line for line in diff if not line.startswith("?")]
         changes = [
-            line for line in diff if line.startswith("+") or line.startswith("-")
+            line
+            for line in filtered_diff
+            if line.startswith("+") or line.startswith("-")
         ]
         if not changes:
-            return "（差分はありません）"
-        return "\n".join(diff)
+            return ""
+        return "\n".join(filtered_diff)
 
     def show_cli(self, question: str, original: str, revised: str) -> bool:
+        diff = self.display_diff(original=original, revised=revised)
+        if not diff:
+            print(f"質問: {question}")
+            print("差分はありません。")
+            return False
+
         print(f"質問: {question}")
         print("--- 差分 ---")
-        print(self.display_diff(original=original, revised=revised))
+        print(diff)
         ans = input("更新しますか？ (y/n): ").strip().lower()
         return ans == "y"
 
     def show_gui(self, question: str, original: str, revised: str):
+        diff = self.display_diff(original=original, revised=revised)
+        if not diff:
+            print(f"質問: {question}")
+            print("差分はありません。")
+            return False
+
         if not self.use_gui:
             return self.show_cli(question=question, original=original, revised=revised)
         root = tk.Tk()
@@ -52,9 +67,7 @@ class DiffViewer:
         diff_text = scrolledtext.ScrolledText(
             master=diff_frame, width=110, height=25, font=("Meiryo UI", 10)
         )
-        diff_text.insert(
-            index=tk.END, chars=self.display_diff(original=original, revised=revised)
-        )
+        diff_text.insert(index=tk.END, chars=diff)
         diff_text.config(state=tk.DISABLED)
         diff_text.pack(side="left", fill="both", expand=True)
 
