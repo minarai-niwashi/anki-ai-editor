@@ -1,6 +1,8 @@
 import difflib
 import os
 import platform
+import subprocess
+import tempfile
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
 
@@ -29,31 +31,41 @@ class DiffViewer:
             return ""
         return "\n".join(filtered_diff)
 
-    def show_cli(self, question: str, original: str, revised: str) -> bool:
+    def show_cli(self, question: str, original: str, revised: str) -> str | None:
         diff = self.display_diff(original=original, revised=revised)
-        if not diff:
-            print(f"質問: {question}")
-            print("差分はありません。")
-            return False
-
         print(f"質問: {question}")
+        if not diff:
+            print("差分はありません。")
+            return None
+
         print("--- 差分 ---")
         print(diff)
+        with tempfile.NamedTemporaryFile(
+            suffix=".txt", delete=False, mode="w+", encoding="utf-8"
+        ) as temp_file:
+            temp_file.write(revised)
+            temp_file.flush()
+            editor = os.environ.get("EDITOR", default="vi")
+            subprocess.call(args=[editor, temp_file.name])
+            temp_file.seek(0)
+            updated = temp_file.read().strip()
+        os.unlink(path=temp_file.name)
         ans = input("更新しますか？ (y/n): ").strip().lower()
-        return ans == "y"
+        return updated if ans == "y" else None
 
-    def show_gui(self, question: str, original: str, revised: str):
+    def show_gui(self, question: str, original: str, revised: str) -> str | None:
+        if not self.use_gui:
+            return self.show_cli(question=question, original=original, revised=revised)
+
         diff = self.display_diff(original=original, revised=revised)
         if not diff:
             print(f"質問: {question}")
             print("差分はありません。")
-            return False
+            return None
 
-        if not self.use_gui:
-            return self.show_cli(question=question, original=original, revised=revised)
         root = tk.Tk()
         root.title(string="差分プレビュー")
-        root.geometry(newGeometry="900x600")
+        root.geometry(newGeometry="900x800")
         root.resizable(width=False, height=False)
 
         question_label = tk.Label(
@@ -71,15 +83,26 @@ class DiffViewer:
         diff_text.config(state=tk.DISABLED)
         diff_text.pack(side="left", fill="both", expand=True)
 
+        edit_frame = tk.LabelFrame(
+            master=root, text="編集（必要に応じて修正してください）", padx=10, pady=10
+        )
+        edit_frame.pack(expand=True, fill="both", padx=10, pady=5)
+
+        edit_text = scrolledtext.ScrolledText(
+            master=edit_frame, width=110, height=8, font=("Meiryo UI", 10)
+        )
+        edit_text.insert(index="1.0", chars=revised)
+        edit_text.pack(fill="both", expand=True)
+
         button_frame = tk.Frame(master=root)
         button_frame.pack(pady=15)
 
         def on_confirm():
-            root.confirm_result = True
+            root.edited_text = edit_text.get(index1="1.0", index2="end-1c")
             root.destroy()
 
         def on_cancel():
-            root.confirm_result = False
+            root.edited_text = None
             root.destroy()
 
         ttk.Button(master=button_frame, text="✅ 更新する", command=on_confirm).grid(
@@ -89,10 +112,10 @@ class DiffViewer:
             row=0, column=1, padx=20
         )
 
-        root.confirm_result = False
+        root.edited_text = None
         root.mainloop()
 
-        return root.confirm_result
+        return root.edited_text
 
     def confirm_resubmit(self, question: str, answer: str) -> bool:
         message = f"このカードは既にAIで推敲されています。\n\n質問: {question}\n答え: {answer}\n\n再度推敲しますか？"

@@ -25,11 +25,12 @@ class App:
                 category=category, question=question, answer=answer
             )
 
-            if self.viewer.show_gui(
+            updated = self.viewer.show_gui(
                 question=question, original=answer, revised=revised
-            ):
+            )
+            if updated is not None:
                 self.anki.update_note_answer(
-                    note_id=card["note_id"], new_answer=revised
+                    note_id=card["note_id"], new_answer=updated
                 )
                 self.anki.add_ai_tag_to_note(note_id=card["note_id"], tag="edited")
                 print("-> 更新 & タグを追加しました")
