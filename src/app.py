@@ -10,8 +10,10 @@ class App:
         self.editor = CardEditor()
 
     def run(self):
+        deck_names = self.anki.get_all_decks()
+        selected_deck = self.viewer.select_deck(deck_names=deck_names)
         print("Ankiからカードを取得中...")
-        cards = self.anki.get_all_cards()
+        cards = self.anki.get_cards_by_deck(deck_name=selected_deck)
         for card in cards:
             category = card["category"]
             question = card["question"]

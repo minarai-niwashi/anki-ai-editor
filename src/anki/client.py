@@ -78,3 +78,25 @@ class AnkiClient:
         if result and "tags" in result[0]:
             return tag in result[0]["tags"]
         return False
+
+    def get_all_decks(self) -> list[str]:
+        return self._invoke(action="deckNames")
+
+    def get_cards_by_deck(self, deck_name: str) -> list[dict]:
+        card_ids = self._invoke(action="findCards", query=f"deck:{deck_name}")
+        notes = self._invoke(action="cardsInfo", cards=card_ids)
+        cards = []
+        for note in notes:
+            note_id = note["note"]
+            question = strip_html(html=note["question"])
+            answer = strip_html(html=note["answer"])
+            categoty = note["deckName"]
+            cards.append(
+                {
+                    "note_id": note_id,
+                    "question": question,
+                    "answer": answer,
+                    "category": categoty,
+                }
+            )
+        return cards
