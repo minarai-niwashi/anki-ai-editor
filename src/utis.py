@@ -133,6 +133,33 @@ class DiffViewer:
         root.destroy()
         return result
 
+    def select_deck(self, deck_names: list[str]) -> str:
+        if not self.use_gui:
+            print("デッキを選択してください：")
+            for i, name in enumerate(deck_names):
+                print(f"{i + 1}: {name}")
+            index = int(input("番号を入力してください：")) - 1
+            return deck_names[index]
+
+        root = tk.Tk()
+        root.title("デッキ選択")
+        root.geometry("400x200")
+        selected = tk.StringVar(root)
+        selected.set(deck_names[0])
+
+        tk.Label(root, text="使用するデッキを選んでください：").pack(pady=20)
+        dropdown = ttk.OptionMenu(root, selected, deck_names[0], *deck_names)
+        dropdown.pack()
+
+        def on_confirm():
+            root.selected_deck = selected.get()
+            root.destroy()
+
+        ttk.Button(root, text="OK", command=on_confirm).pack(pady=20)
+        root.selected_deck = deck_names[0]
+        root.mainloop()
+        return root.selected_deck
+
 
 def check_response_ok(response):
     if not response.ok:
