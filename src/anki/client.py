@@ -44,10 +44,7 @@ class AnkiClient:
         )
         return check_response_ok(response=response)
 
-    def get_all_cards(self):
-        query = "deck:*"
-        card_ids = self._invoke(action="findCards", query=query)
-        notes = self._invoke(action="cardsInfo", cards=card_ids)
+    def _parse_notes(self, notes: list[dict]) -> list[dict]:
         cards = []
         for note in notes:
             note_id = note["note"]
@@ -63,6 +60,12 @@ class AnkiClient:
                 }
             )
         return cards
+
+    def get_all_cards(self):
+        query = "deck:*"
+        card_ids = self._invoke(action="findCards", query=query)
+        notes = self._invoke(action="cardsInfo", cards=card_ids)
+        return self._parse_notes(notes=notes)
 
     def update_note_answer(self, note_id: str, new_answer: str):
         return self._invoke(
@@ -85,18 +88,4 @@ class AnkiClient:
     def get_cards_by_deck(self, deck_name: str) -> list[dict]:
         card_ids = self._invoke(action="findCards", query=f"deck:{deck_name}")
         notes = self._invoke(action="cardsInfo", cards=card_ids)
-        cards = []
-        for note in notes:
-            note_id = note["note"]
-            question = strip_html(html=note["question"])
-            answer = strip_html(html=note["answer"])
-            categoty = note["deckName"]
-            cards.append(
-                {
-                    "note_id": note_id,
-                    "question": question,
-                    "answer": answer,
-                    "category": categoty,
-                }
-            )
-        return cards
+        return self._parse_notes(notes=notes)
