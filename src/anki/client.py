@@ -86,6 +86,6 @@ class AnkiClient:
         return self._invoke(action="deckNames")
 
     def get_cards_by_deck(self, deck_name: str) -> list[dict]:
-        card_ids = self._invoke(action="findCards", query=f"deck:{deck_name}")
+        card_ids = self._invoke(action="findCards", query=f'deck:"{deck_name}"')
         notes = self._invoke(action="cardsInfo", cards=card_ids)
         return self._parse_notes(notes=notes)
