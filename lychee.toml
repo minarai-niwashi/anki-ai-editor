@@ -1,2 +1,7 @@
-# Exclude URLs and mail addresses from checking (supports regex).
-exclude = ["\\{\\{[^}]+\\}\\}"]
+exclude = [
+  "{{ url_for('deck', deck_name=deck_name, page=1) }}",
+  "{{ url_for('deck', deck_name=deck_name, page=page-1) }}",
+  "{{ url_for('deck', deck_name=deck_name, page=page+1) }}",
+  "{{ url_for('index') }}",
+  "{{ url_for('card_view', note_id=c.note_id, deck=deck_name) }}"
+]
