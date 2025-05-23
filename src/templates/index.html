@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="Ankiデッキ一覧" />
+    <title>Anki AI Editor – デッキ一覧</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
+    />
+  </head>
+  <body class="section">
+    <h1 class="title">デッキ一覧</h1>
+    <div class="content">
+      <ul>
+        {% for deck in decks %}
+        <li>
+          <a
+            href="{{ url_for('deck', deck_name=deck, page=1) }}"
+            class="has-text-link"
+            >{{ deck }}</a
+          >
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </body>
+</html>
