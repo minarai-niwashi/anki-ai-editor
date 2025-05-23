@@ -1,0 +1,2 @@
+# Exclude URLs and mail addresses from checking (supports regex).
+exclude = ["\{\{.*\}\}"]
