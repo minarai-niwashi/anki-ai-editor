@@ -20,7 +20,7 @@ a.secret_key = os.getenv("FLASK_SECRET_KEY", default=secrets.token_urlsafe(16))
 
 anki = AnkiClient()
 editor = CardEditor()
-html_diff = HtmlDiff(tabsize=4, wrapcolumn=80)
+html_diff = HtmlDiff(tabsize=4)
 
 PAGE_SIZE = 10
 TEMPLATES_PATH = Path(__file__).parent / "templates"
@@ -96,11 +96,11 @@ def card_view(note_id: int):
                 category=deck_name, question=question, answer=original_answer
             )
             diff_html = html_diff.make_table(
-                original_answer.split(),
-                refined.split(),
+                original_answer.splitlines(),
+                refined.splitlines(),
                 fromdesc="Original",
                 todesc="Refined",
-            )
+            ).replace('class="diff"', 'class="table is-bordered"')
             return render_template(
                 "card.html",
                 note_id=note_id,
