@@ -1,67 +1,49 @@
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="description" content="選択されたAnkiデッキのカードを一覧表示" />
-    <title>{{ deck_name }} – カード一覧</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
-    />
-  </head>
-  <body class="section">
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %}
+{% extends "base.html" %}
+{% block title %}{{ deck_name }} – カード一覧{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
     <div class="mb-4">
       {% for category, msg in messages %}
-      <div
-        class="notification is-{{ 'success' if category=='success' else 'info' }}"
-      >
-        {{ msg }}
-      </div>
+        <div class="notification is-{{ 'success' if category=='success' else 'info' }}">
+          {{ msg }}
+        </div>
       {% endfor %}
     </div>
-    {% endif %} {% endwith %}
-    <h1 class="title">デッキ: {{ deck_name }}</h1>
-    <table class="table is-striped is-fullwidth">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>質問</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in cards %}
-        <tr>
-          <td>{{ loop.index + (page-1)*10 }}</td>
-          <td>{{ c.question|truncate(80) }}</td>
-          <td>
-            <a
-              class="button is-small is-link"
-              href="{{ url_for('card_view', note_id=c.note_id, deck=deck_name) }}"
-              >編集</a
-            >
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <nav class="pagination" role="navigation" aria-label="pagination">
-      {% if page > 1 %}
-      <a
-        class="pagination-previous"
-        href="{{ url_for('deck', deck_name=deck_name, page=page-1) }}"
-        >前へ</a
-      >
-      {% endif %} {% if page < total_pages %}
-      <a
-        class="pagination-next"
-        href="{{ url_for('deck', deck_name=deck_name, page=page+1) }}"
-        >次へ</a
-      >
-      {% endif %}
-    </nav>
-    <p class="mt-4"><a href="{{ url_for('index') }}">← デッキ一覧へ戻る</a></p>
-  </body>
-</html>
+  {% endif %}
+{% endwith %}
+
+<h1 class="title">デッキ: {{ deck_name }}</h1>
+
+<table class="table is-striped is-fullwidth">
+  <thead>
+    <tr><th>#</th><th>質問</th><th>操作</th></tr>
+  </thead>
+  <tbody>
+    {% for c in cards %}
+      <tr>
+        <td>{{ loop.index + (page-1)*10 }}</td>
+        <td>{{ c.question | truncate(80) }}</td>
+        <td>
+          <a class="button is-small is-link"
+             href="{{ url_for('card_view', note_id=c.note_id, deck=deck_name) }}">編集</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<nav class="pagination" role="navigation" aria-label="pagination">
+  {% if page > 1 %}
+    <a class="pagination-previous"
+       href="{{ url_for('deck', deck_name=deck_name, page=page-1) }}">前へ</a>
+  {% endif %}
+  {% if page < total_pages %}
+    <a class="pagination-next"
+       href="{{ url_for('deck', deck_name=deck_name, page=page+1) }}">次へ</a>
+  {% endif %}
+</nav>
+
+<p class="mt-4"><a href="{{ url_for('index') }}">← デッキ一覧へ戻る</a></p>
+{% endblock %}
