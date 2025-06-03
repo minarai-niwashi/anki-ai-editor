@@ -29,6 +29,6 @@
 </form>
 
 <p class="mt-4">
-  <a href="{{ url_for('deck', deck_name=deck_name, page=1) }}">← カード一覧へ戻る</a>
+  <a href="{{ url_for('deck', deck_name=deck_name, page=request.args.get('page', 1)) }}">← カード一覧へ戻る</a>
 </p>
 {% endblock %}
