@@ -60,7 +60,8 @@ def card_view(note_id: int):
 
     # 参照デッキ名をクエリで渡す
     deck_name = request.args.get("deck")
-    redirect_target = url_for("deck", deck_name=deck_name)
+    page = request.args.get("page", default=1, type=int)
+    redirect_target = url_for("deck", deck_name=deck_name, page=page)
 
     if request.method == "GET":
         get_flashed_messages()

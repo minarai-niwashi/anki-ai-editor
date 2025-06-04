@@ -27,7 +27,7 @@
         <td>{{ c.question | truncate(80) }}</td>
         <td>
           <a class="button is-small is-link"
-             href="{{ url_for('card_view', note_id=c.note_id, deck=deck_name) }}">編集</a>
+             href="{{ url_for('card_view', note_id=c.note_id, deck=deck_name, page=page) }}">編集</a>
         </td>
       </tr>
     {% endfor %}
