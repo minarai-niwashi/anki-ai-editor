@@ -1,6 +1,6 @@
 from anki.client import AnkiClient
 from card_editor.generator import CardEditor
-from utis import DiffViewer
+from utils import DiffViewer
 
 
 class App:

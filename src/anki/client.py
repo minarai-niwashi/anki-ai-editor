@@ -5,7 +5,7 @@ from html.parser import HTMLParser
 import requests
 
 from config import ANKI_URL, KEY
-from utis import check_response_ok
+from utils import check_response_ok
 
 
 class HTMLStripper(HTMLParser):
